@@ -1,4 +1,5 @@
-export default { //this tell clerk how to fone home when we authenticate. this is to validate the logged in user
+export default {
+    //this tell clerk how to fone home when we authenticate. this is to validate the logged in user
 
     providers: [
         {
