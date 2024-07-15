@@ -31,11 +31,6 @@ export function UploadFile({ children }: IUploadFileProps) {
                         <FormUpload setIsDialogOpen={setIsDialogOpen} />
                     </DialogDescription>
                 </DialogHeader>
-                {/* <DialogFooter className="flex justify-end">
-                    <button onClick={() => setIsDialogOpen(false)}>
-                        Cancel
-                    </button>
-                </DialogFooter> */}
             </DialogContent>
         </Dialog>
     );
