@@ -15,7 +15,7 @@ export async function getUser(ctx: QueryCtx | MutationCtx, tokenIdentifier: stri
     return user;
 }
 
-
+// the internal method is called from the mutations to the model in the server side after webhooks have been triggered
 export const createUser = internalMutation({
     args: { tokenIdentifier: v.string() },
     async handler(ctx, args) {
