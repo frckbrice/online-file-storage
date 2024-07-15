@@ -15,7 +15,7 @@ import { headers } from "next/headers";
 /** this webhook come from convex dashboard .env variable */
 const webhookServer = process.env.CLERK_WEBHOOK_SECRET ?? ``;
 
-/** this action is used to verify the webhook is internal and only be call by mutation, query and action internal to your system. it is also used for third party interaction */
+/** this action is used to verify the webhook is internal and will only be call by mutation, query and action internal to your system. it is also used for third party interaction */
 export const fulfill = internalAction({
     args: {
         headers: v.any(),
