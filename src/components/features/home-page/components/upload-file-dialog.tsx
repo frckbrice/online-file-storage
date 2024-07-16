@@ -9,6 +9,8 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { FormUpload } from './upload-form';
+import { Button } from '@/components/ui/button';
+import { PlusIcon } from 'lucide-react';
 
 
 export interface IUploadFileProps {
@@ -23,7 +25,11 @@ export function UploadFile({ children }: IUploadFileProps) {
 
     return (
         <Dialog open={isdialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>{children}</DialogTrigger>
+            <DialogTrigger asChild>
+                <Button >
+                    <PlusIcon size={20} /> &nbsp; Upload File
+                </Button>
+            </DialogTrigger>
             <DialogContent >
                 <DialogHeader className="space-y-8">
                     <DialogTitle>Upload Your File</DialogTitle>

@@ -21,6 +21,7 @@ import * as React from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Doc } from "../../../../../convex/_generated/dataModel";
 
 
 type TFormProps = {
@@ -50,8 +51,18 @@ export function FormUpload({ setIsDialogOpen }: TFormProps) {
 
     if (!orgId) return <div>NO organization or user connected</div>
 
+    // define the types of image allowed by the system.
+    const types = {
+        "application/pdf": "pdf",
+        "image/png": "image",
+        "image/jpeg": "image",
+        "image/jpg": "image",
+        "text/csv": "csv",
+    } as Record<string, Doc<"files">["type"]>;
+
     const onSubmit = async (values: FormDataType) => {
         startTransition(async () => {
+
             try {
                 const postUrl = await generateUploadUrl();
                 const result = await fetch(postUrl, {
@@ -63,7 +74,8 @@ export function FormUpload({ setIsDialogOpen }: TFormProps) {
                 await createFile({
                     name: values.title,
                     organizationId: orgId as string,
-                    fileId: storageId
+                    fileId: storageId,
+                    type: types[values.file!.type],
                 });
                 toast.success("File uploaded successfully");
                 setIsDialogOpen(false);

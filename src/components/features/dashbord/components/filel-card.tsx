@@ -18,7 +18,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreVertical, TrashIcon } from 'lucide-react';
+import { DownloadIcon, FileIcon, FileImageIcon, FilesIcon, FileX2Icon, GanttChartIcon, GitPullRequestDraftIcon, ImageIcon, MoreVertical, TrashIcon } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -31,6 +31,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 
 export interface IFileCardProps {
@@ -102,23 +103,62 @@ export function FileCard({ file }: IFileCardProps) {
     // this gives information about the current organization.
     const organization = useOrganization();
     let orgId: string | undefined = organization.organization?.id ?? user.user?.id;
+    {/* <FileIcon size={30} /> */ }
+    const fileType = {
+        pdf: <span className=' flex items-center w-20 h-20'>&nbsp; Document</span>,
+        image: <span className=' flex items-center'><ImageIcon size={30} /> '📄'&nbsp; Image</span>,
+        csv: <span className=' flex items-center'><GanttChartIcon size={30} />&nbsp; CSV</span>,
+    } as Record<Doc<"files">["type"], React.ReactNode>;
+    //
+
+    //query to get the file url
+    const getFileUrl = useQuery(api.files.getFileUrl, {
+        fileId: file.fileId,
+        organizationId: orgId as string
+    })
 
     return (
         <Card>
             <CardHeader className=' relative '>
-                <CardTitle>
-                    {file.name}
+                <CardTitle className=' flex items-center gap-2'>
+
+                    <span>{file.name}</span>
                 </CardTitle>
                 <div className=' absolute top-5 right-1'>
                     <FileCardActions fileId={file._id} />
                 </div>
-                <CardDescription>Card Description</CardDescription>
+                {/* <CardDescription>Card Description</CardDescription> */}
             </CardHeader>
-            <CardContent>
-                <p>Card Content</p>
+            <CardContent className=' h-[250px] display flex justify-start'>
+                {file.type === "image" && (
+                    <Image
+                        src={getFileUrl as string}
+                        width={200}
+                        height={100}
+                        alt={"logo"}
+                    />
+                )}
+                {file.type === "pdf" && (
+                    <Image
+                        src={"/images/pdf_file.png" as string}
+                        width={200}
+                        height={100}
+                        alt={"logo"}
+                    />
+                )}
+                {file.type === "csv" && (
+                    <Image
+                        src={"/images/csv_file.jpg" as string}
+                        width={200}
+                        height={100}
+                        alt={"logo"}
+                    />
+                )}
+                {/* <p>{fileType[file.type]}</p> */}
             </CardContent>
             <CardFooter >
-                <Button>Download</Button>
+                <Button onClick={() => window.open(getFileUrl as string, "_blank")}>
+                    <DownloadIcon size={20} className=' mr-2' /> Download</Button>
             </CardFooter>
         </Card>
     );
