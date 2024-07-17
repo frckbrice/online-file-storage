@@ -1,3 +1,4 @@
+"use client"
 import * as React from 'react';
 import {
     Card,
@@ -16,9 +17,10 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { DownloadIcon, FileIcon, FileImageIcon, FilesIcon, FileX2Icon, GanttChartIcon, GitPullRequestDraftIcon, ImageIcon, MoreVertical, TrashIcon } from 'lucide-react';
+import { DownloadIcon, StarIcon, GanttChartIcon, ImageIcon, MoreVertical, TrashIcon } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -35,7 +37,7 @@ import Image from 'next/image';
 
 
 export interface IFileCardProps {
-    file: Doc<"files">;  // to get the exact type that come from the table.
+    file: Doc<"files">   // to get the exact type that come from the table.
 }
 
 export function AlertDeleteDialog({ isdialogOpen, setIsDialogOpen, fileId }: { isdialogOpen: boolean, setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>, fileId: Id<"files"> }) {
@@ -73,8 +75,12 @@ export function AlertDeleteDialog({ isdialogOpen, setIsDialogOpen, fileId }: { i
 
 
 export function FileCardActions({ fileId }: { fileId: Id<"files"> }) {
+    const { organization } = useOrganization();
+    const user = useUser();
+    let orgId: string | undefined = organization ? organization?.id : user.user?.id;
 
     const [isdialogOpen, setIsDialogOpen] = React.useState(false);
+    const toggleFavorite = useMutation(api.files.toggleFavorite);
 
     return (
         <>
@@ -85,11 +91,22 @@ export function FileCardActions({ fileId }: { fileId: Id<"files"> }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuItem
+                        className=' flex gap-1 text-green-500 items-center cursor-pointer'
+                        onClick={async () => await toggleFavorite({
+                            fileId,
+                        })}
+                    >
+                        <StarIcon color="yellow" size={20} /> Favorites
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
                         className=' flex gap-1 text-red-500 items-center cursor-pointer'
                         onClick={() => setIsDialogOpen(true)}
                     >
                         <TrashIcon size={20} /> Delete
                     </DropdownMenuItem>
+
+
                 </DropdownMenuContent>
             </DropdownMenu>
         </>
@@ -113,7 +130,7 @@ export function FileCard({ file }: IFileCardProps) {
 
     //query to get the file url
     const getFileUrl = useQuery(api.files.getFileUrl, {
-        fileId: file.fileId,
+        fileId: file.fileId as Id<"_storage">,
         organizationId: orgId as string
     })
 

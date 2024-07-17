@@ -6,6 +6,15 @@ export const fileType = v.union(
     v.literal("csv"),
     v.literal("pdf"),
 );
+/**
+ *   // type: v.union(
+        //     v.literal("image"),   can also support this.
+        //     v.literal("video"),
+        //     v.literal("document"),
+        //     v.literal("audio"),
+        //     v.literal("other"),
+        // ),
+ */
 
 // we add index to help query data related to the organization "by_orgId"
 // one way to add second field is clear the table and then add the second field in the schema
@@ -13,20 +22,20 @@ export const fileType = v.union(
 export default defineSchema({
     files: defineTable({
         name: v.string(),
-        organizationId: v.string(),
+        organizationId: v.string(), // thir org is the current connected account.
         fileId: v.id("_storage"),
-        // type: v.union(
-        //     v.literal("image"),   can also support this.
-        //     v.literal("video"),
-        //     v.literal("document"),
-        //     v.literal("audio"),
-        //     v.literal("other"),
-        // ),
         type: fileType
     })
         .index("by_orgId", ["organizationId"]),
+    favorites: defineTable({
+        fileId: v.id("files"), // relationship to files table
+        userId: v.id("users"), // relationship to users table
+        orgId: v.string(),  // limit to the current organization
+    })
+        .index("by_userId_orgId_fileId", ["userId", "orgId", "fileId"]),
     users: defineTable({
         tokenIdentifier: v.string(),
         orgIds: v.array(v.string()),
-    }).index("by_tokenIdentifier", ["tokenIdentifier"]),
+    })
+        .index("by_tokenIdentifier", ["tokenIdentifier"]),
 });

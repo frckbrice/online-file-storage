@@ -1,3 +1,4 @@
+"use client"
 import * as React from 'react';
 import {
     Dialog,
@@ -26,7 +27,7 @@ export function UploadFile({ children }: IUploadFileProps) {
     return (
         <Dialog open={isdialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button >
+                <Button className=' text-lg'>
                     <PlusIcon size={20} /> &nbsp; Upload File
                 </Button>
             </DialogTrigger>
