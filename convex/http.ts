@@ -33,7 +33,15 @@ http.route({
                 case "organizationMembership.created":
                     await ctx.runMutation(internal.users.addOrgIdToUser, {
                         tokenIdentifier: `https://top-kid-17.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
-                        organizationId: result.data.organization.id
+                        organizationId: result.data.organization.id,
+                        role: result.data.role === "org:admin" ? "admin" : "member"
+                    })
+                    break;
+                case "organizationMembership.updated":
+                    await ctx.runMutation(internal.users.updateRoleInOrgForUser, {
+                        tokenIdentifier: `https://top-kid-17.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
+                        organizationId: result.data.organization.id,
+                        role: result.data.role === "org:admin" ? "admin" : "member"
                     })
                     break;
                 default:

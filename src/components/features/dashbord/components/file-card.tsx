@@ -12,7 +12,7 @@ import { Doc, Id } from '../../../../../convex/_generated/dataModel';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
-import { useOrganization, useUser } from "@clerk/nextjs";
+import { Protect, useOrganization, useUser } from "@clerk/nextjs";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,7 +20,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { DownloadIcon, StarIcon, GanttChartIcon, ImageIcon, MoreVertical, TrashIcon } from 'lucide-react';
+import { DownloadIcon, StarIcon, GanttChartIcon, ImageIcon, MoreVertical, TrashIcon, StarHalf } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -38,6 +38,7 @@ import Image from 'next/image';
 
 export interface IFileCardProps {
     file: Doc<"files">   // to get the exact type that come from the table.
+    favorites: Doc<"favorites">[]
 }
 
 export function AlertDeleteDialog({ isdialogOpen, setIsDialogOpen, fileId }: { isdialogOpen: boolean, setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>, fileId: Id<"files"> }) {
@@ -74,10 +75,7 @@ export function AlertDeleteDialog({ isdialogOpen, setIsDialogOpen, fileId }: { i
 }
 
 
-export function FileCardActions({ fileId }: { fileId: Id<"files"> }) {
-    const { organization } = useOrganization();
-    const user = useUser();
-    let orgId: string | undefined = organization ? organization?.id : user.user?.id;
+export function FileCardActions({ fileId, isFavorite }: { fileId: Id<"files">, isFavorite: boolean }) {
 
     const [isdialogOpen, setIsDialogOpen] = React.useState(false);
     const toggleFavorite = useMutation(api.files.toggleFavorite);
@@ -96,9 +94,20 @@ export function FileCardActions({ fileId }: { fileId: Id<"files"> }) {
                             fileId,
                         })}
                     >
-                        <StarIcon color="yellow" size={20} /> Favorites
+                        {
+                            isFavorite ? <div className=' flex items-center gap-1'>
+                                <StarIcon size={20} />Unfavorite
+                            </div> : <div className=' flex items-center gap-1'>
+                                <StarHalf size={20} />Favorites
+                            </div>
+                        }
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    {/* <Protect
+                        permission="org:admin"
+                        fallback={<p></p>}
+                    > */}
+
                     <DropdownMenuItem
                         className=' flex gap-1 text-red-500 items-center cursor-pointer'
                         onClick={() => setIsDialogOpen(true)}
@@ -106,7 +115,7 @@ export function FileCardActions({ fileId }: { fileId: Id<"files"> }) {
                         <TrashIcon size={20} /> Delete
                     </DropdownMenuItem>
 
-
+                    {/* </Protect> */}
                 </DropdownMenuContent>
             </DropdownMenu>
         </>
@@ -115,7 +124,7 @@ export function FileCardActions({ fileId }: { fileId: Id<"files"> }) {
 }
 
 
-export function FileCard({ file }: IFileCardProps) {
+export function FileCard({ file, favorites }: IFileCardProps) {
     const user = useUser();
     // this gives information about the current organization.
     const organization = useOrganization();
@@ -132,7 +141,9 @@ export function FileCard({ file }: IFileCardProps) {
     const getFileUrl = useQuery(api.files.getFileUrl, {
         fileId: file.fileId as Id<"_storage">,
         organizationId: orgId as string
-    })
+    });
+
+    const isFavorite = favorites?.length > 0 && favorites.some((favorite) => favorite.fileId === file._id);
 
     return (
         <Card>
@@ -142,7 +153,7 @@ export function FileCard({ file }: IFileCardProps) {
                     <span>{file.name}</span>
                 </CardTitle>
                 <div className=' absolute top-5 right-1'>
-                    <FileCardActions fileId={file._id} />
+                    <FileCardActions isFavorite={isFavorite} fileId={file._id} />
                 </div>
                 {/* <CardDescription>Card Description</CardDescription> */}
             </CardHeader>

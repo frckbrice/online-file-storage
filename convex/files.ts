@@ -30,7 +30,7 @@ export const createFile = mutation({
         const user = await getUser(ctx, identity.tokenIdentifier);
 
         // check if the user is part of the organization before inserting new file's data.
-        if (!user.orgIds.includes(args.organizationId)) {
+        if (!user.orgIds!.some((org) => org.orgId === args.organizationId)) {
             throw new Error("You must be part of the organization to perform this action");
         }
 
@@ -54,7 +54,7 @@ export const getFileUrl = query({
         const user = await getUser(ctx, identity.tokenIdentifier);
 
         // check if the user is part of the organization before inserting new file's data.
-        if (!user.orgIds.includes(args.organizationId)) {
+        if (!user.orgIds!.some((org) => org.orgId === args.organizationId)) {
             throw new Error("You must be part of the organization to delete this file");
         }
         return await ctx.storage.getUrl(args.fileId);
@@ -127,10 +127,18 @@ export const deleteFile = mutation({
             throw new Error("File not found");
         }
 
+
         // check if the user is part of the organization before inserting new file's data.
-        if (!user.orgIds.includes(existingFile.organizationId)) {
+        if (!user.orgIds!.some((org) => org.orgId === existingFile.organizationId)) {
             throw new Error("You must be part of the organization to delete this file");
         }
+
+        // make sure the user is admin before he delete a file
+        const isAdmin = user.orgIds!.some((org) => org.role === "admin" && org.orgId === existingFile.organizationId);
+        if (!isAdmin) {
+            throw new Error("You must be an admin to delete this file");
+        }
+
         // finally delete the file from DB.
         await ctx.db.delete(args.fileId);
     }
@@ -141,7 +149,7 @@ export const getFavoriteFiles = query({
     args: { orgId: v.string() },
     async handler(ctx, args) {
 
-        //authenticate the user first
+        //authenticate the user first by getting his identity
         const id = await ctx.auth.getUserIdentity();
         // verify the existence of a user to allow the query action
         if (!id) return null;
@@ -187,7 +195,7 @@ export const toggleFavorite = mutation({
         }
 
         // check if the user is part of the organization that own the file.
-        if (!user.orgIds.includes(file.organizationId)) {
+        if (!user.orgIds!.some((org) => org.orgId === file.organizationId)) {
             throw new Error("You must be part of the organization to perform this action");
         }
 

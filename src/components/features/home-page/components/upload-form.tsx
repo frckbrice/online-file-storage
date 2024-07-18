@@ -64,6 +64,7 @@ export function FormUpload({ setIsDialogOpen }: TFormProps) {
         startTransition(async () => {
 
             try {
+                // it generates the upload url: https://<convex.dev>/api/storage/fileId
                 const postUrl = await generateUploadUrl();
                 const result = await fetch(postUrl, {
                     method: "POST",

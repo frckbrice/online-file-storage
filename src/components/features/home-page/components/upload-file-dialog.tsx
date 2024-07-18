@@ -27,8 +27,8 @@ export function UploadFile({ children }: IUploadFileProps) {
     return (
         <Dialog open={isdialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button className=' text-lg'>
-                    <PlusIcon size={20} /> &nbsp; Upload File
+                <Button className=' ' size="sm">
+                    <PlusIcon /> &nbsp; Upload File
                 </Button>
             </DialogTrigger>
             <DialogContent >

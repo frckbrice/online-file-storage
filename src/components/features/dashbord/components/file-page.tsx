@@ -82,6 +82,8 @@ export default function FilePage({
     else
         files = useQuery(api.files.getFiles, orgId ? { organizationId: orgId, query, favorite } : "skip") as FavoriteFileType[];
 
+    const favorites = useQuery(api.files.getFavoriteFiles, orgId ? { orgId } : "skip") as FavoriteFileType[]
+
     const isLoading = files === undefined;
 
     return (
@@ -103,7 +105,7 @@ export default function FilePage({
                             <>
 
                                 <div className=" flex justify-evenly items-center ">
-                                    <h1 className=" text-3xl font-bold">{title}</h1>
+                                    <h1 className=" text-xl font-bold">{title}</h1>
 
                                     {/* TODO: add serch onchange event after enter key */}
                                     <SearchBar query={query} setQuery={setQuery} />
@@ -117,7 +119,7 @@ export default function FilePage({
                                 {/* show files */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4 mb-8">
                                     {files?.map((file) => (
-                                        <FileCard key={file?._id} file={file} />
+                                        <FileCard favorites={favorites} key={file?._id} file={file} />
                                     ))}
                                 </div>
                             </>
